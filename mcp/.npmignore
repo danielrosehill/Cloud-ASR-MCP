@@ -1,0 +1,8 @@
+src/
+tsconfig.json
+.env*
+*.md
+!README.md
+api-ref/
+idea/
+validation/
