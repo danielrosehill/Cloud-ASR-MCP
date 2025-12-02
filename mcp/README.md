@@ -1,7 +1,5 @@
 # Cloud ASR MCP
 
-[![npm version](https://badge.fury.io/js/cloud-asr-mcp.svg)](https://www.npmjs.com/package/cloud-asr-mcp)
-
 A Model Context Protocol (MCP) server providing cloud-based speech-to-text transcription using multiple backends: Google Gemini, OpenAI, and AssemblyAI.
 
 ## Features
@@ -25,7 +23,7 @@ A Model Context Protocol (MCP) server providing cloud-based speech-to-text trans
 
 ## Installation
 
-### From npm (recommended)
+### From npm
 
 ```bash
 npm install -g cloud-asr-mcp
@@ -48,9 +46,6 @@ Set the following environment variables for the backends you want to use:
 GEMINI_API_KEY="your-gemini-api-key"
 OPENAI_API_KEY="your-openai-api-key"
 ASSEMBLYAI_API_KEY="your-assemblyai-api-key"  # Also accepts ASSEMBLY_API_KEY
-
-# Optional: Override default OpenAI model
-OPENAI_TRANSCRIPTION_MODEL="gpt-4o-transcribe"  # or gpt-4o-mini-transcribe
 ```
 
 ## Claude Code MCP Configuration
@@ -133,5 +128,6 @@ MIT
 
 ## Links
 
+- [GitHub Repository](https://github.com/danielrosehill/Cloud-ASR-MCP)
 - [npm Package](https://www.npmjs.com/package/cloud-asr-mcp)
 - [Report Issues](https://github.com/danielrosehill/Cloud-ASR-MCP/issues)
