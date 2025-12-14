@@ -1,11 +1,19 @@
+export interface TranscriptionUsage {
+  input_tokens: number;
+  output_tokens: number;
+  generation_id?: string;
+  actual_cost?: number;
+}
+
 export interface TranscriptionResponse {
   title: string;
   description: string;
   transcript: string;
   timestamp: string;
   timestamp_readable: string;
-  backend: 'gemini' | 'openai' | 'assemblyai';
+  backend: 'gemini' | 'openai' | 'openrouter' | 'voxtral';
   model?: string;
+  usage?: TranscriptionUsage;
 }
 
 export interface TranscriptionResult {
@@ -33,6 +41,3 @@ export const OPENAI_MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
 // Gemini has larger limits but we'll downsample for efficiency
 export const GEMINI_MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024;
 export const GEMINI_DOWNSAMPLE_THRESHOLD_BYTES = 15 * 1024 * 1024;
-
-// AssemblyAI accepts URLs or uploaded files
-export const ASSEMBLYAI_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 * 1024; // 5GB

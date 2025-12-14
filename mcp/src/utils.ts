@@ -2,6 +2,7 @@ import { spawn } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import * as crypto from 'crypto';
 import { SUPPORTED_FORMATS, GEMINI_DOWNSAMPLE_THRESHOLD_BYTES } from './types.js';
 
 export interface AudioFileInfo {
@@ -10,6 +11,95 @@ export interface AudioFileInfo {
   mimeType: string;
   needsCleanup: boolean;
   fileSize: number;
+}
+
+export interface RemoteFileInput {
+  file_path?: string;
+  file_content?: string;
+  file_name?: string;
+}
+
+export interface ResolvedFile {
+  filePath: string;
+  needsCleanup: boolean;
+  mimeType: string;
+}
+
+/**
+ * Writes base64-encoded file content to a temporary file.
+ * Returns the path to the temp file.
+ */
+export function writeBase64ToTempFile(base64Content: string, fileName?: string): string {
+  const tempDir = os.tmpdir();
+  const ext = fileName ? path.extname(fileName).toLowerCase() : '.mp3';
+  const uniqueId = crypto.randomBytes(8).toString('hex');
+  const tempPath = path.join(tempDir, `cloud_asr_remote_${uniqueId}${ext}`);
+
+  const buffer = Buffer.from(base64Content, 'base64');
+  fs.writeFileSync(tempPath, buffer);
+
+  return tempPath;
+}
+
+/**
+ * Resolves a file input (either local path or base64 content) to a local file path.
+ * If base64 content is provided, writes it to a temp file.
+ * Returns file info including whether cleanup is needed.
+ */
+export function resolveFileInput(input: RemoteFileInput): ResolvedFile {
+  if (input.file_content) {
+    // Remote file: decode base64 and write to temp
+    const tempPath = writeBase64ToTempFile(input.file_content, input.file_name);
+    const mimeType = input.file_name
+      ? getMimeTypeFromFilename(input.file_name)
+      : 'audio/mpeg';
+    return {
+      filePath: tempPath,
+      needsCleanup: true,
+      mimeType,
+    };
+  } else if (input.file_path) {
+    // Local file: use directly
+    return {
+      filePath: input.file_path,
+      needsCleanup: false,
+      mimeType: getMimeType(input.file_path),
+    };
+  } else {
+    throw new Error('Either file_path or file_content must be provided');
+  }
+}
+
+/**
+ * Gets mime type from a filename (when we don't have a local path)
+ */
+export function getMimeTypeFromFilename(fileName: string): string {
+  const ext = path.extname(fileName).toLowerCase();
+  return SUPPORTED_FORMATS[ext] || 'audio/mpeg';
+}
+
+/**
+ * Validates that the extension is supported (for remote files)
+ */
+export function validateFileExtension(fileName: string): void {
+  const ext = path.extname(fileName).toLowerCase();
+  if (!SUPPORTED_FORMATS[ext]) {
+    const supported = Object.keys(SUPPORTED_FORMATS).join(', ');
+    throw new Error(`Unsupported audio format: ${ext}. Supported formats: ${supported}`);
+  }
+}
+
+/**
+ * Cleans up a resolved file if needed (for temp files from remote content)
+ */
+export function cleanupResolvedFile(resolved: ResolvedFile): void {
+  if (resolved.needsCleanup && fs.existsSync(resolved.filePath)) {
+    try {
+      fs.unlinkSync(resolved.filePath);
+    } catch {
+      // Ignore cleanup errors
+    }
+  }
 }
 
 export function validateAudioFile(filePath: string, maxSize?: number): void {

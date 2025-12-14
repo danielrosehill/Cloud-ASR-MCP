@@ -1,7 +1,7 @@
 {
   "name": "cloud-asr-mcp",
-  "version": "0.1.1",
-  "description": "MCP server for audio transcription using multiple cloud backends: Google Gemini, OpenAI, and AssemblyAI",
+  "version": "0.3.0",
+  "description": "MCP server for audio transcription using OpenRouter (Gemini, GPT-4o, Voxtral), Mistral Voxtral, OpenAI, AssemblyAI, and Google Gemini",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -22,6 +22,9 @@
     "transcription",
     "audio",
     "speech-to-text",
+    "openrouter",
+    "voxtral",
+    "mistral",
     "gemini",
     "openai",
     "assemblyai",
@@ -41,9 +44,11 @@
   "dependencies": {
     "@google/genai": "^1.0.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
+    "express": "^4.21.0",
     "openai": "^4.70.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/node": "^20.10.0",
     "typescript": "^5.3.0"
   },
